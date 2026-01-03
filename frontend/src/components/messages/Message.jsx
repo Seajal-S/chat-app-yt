@@ -1,52 +1,95 @@
-// // import { useAuthContext } from "../../context/AuthContext";
-// // import { extractTime } from "../../utils/extractTime";
-// // import useConversation from "../../zustand/useConversation";
+// import { useAuthContext } from "../../context/AuthContext";
+// import { extractTime } from "../../utils/extractTime";
+// import useConversation from "../../zustand/useConversation";
 
 // const Message = ({ message }) => {
-// 	//const { authUser } = useAuthContext();
-// 	//const { selectedConversation } = useConversation();
-// 	//const fromMe = message.senderId === authUser._id;
-// 	//const formattedTime = extractTime(message.createdAt);
-// 	// const chatClassName = fromMe ? "chat-end" : "chat-start";
-// 	// const profilePic = fromMe ? authUser.profilePic : selectedConversation?.profilePic;
-// 	// const bubbleBgColor = fromMe ? "bg-blue-500" : "";
+// 	const { authUser } = useAuthContext();
+// 	const { selectedConversation } = useConversation();
+// 	console.log("senderId:", message.senderId);
+// 	console.log("authUserId:", authUser._id);
 
-// 	// const shakeClass = message.shouldShake ? "shake" : "";
+// 	// ✅ FIXED LINE (nothing else changed)
+// 	const fromMe =
+// 		(message.senderId?._id || message.senderId)?.toString() ===
+// 		authUser._id?.toString();
+
+// 	const formattedTime = extractTime(message.createdAt);
+// 	const chatClassName = fromMe ? "chat-end" : "chat-start";
+// 	const profilePic = fromMe ? authUser.profilePic : selectedConversation?.profilePic;
+
+// 	const bubbleStyle = fromMe
+// 		? "bg-blue-500 text-white"
+// 		: "bg-black text-white";
+
+// 	const shakeClass = message.shouldShake ? "shake" : "";
 
 // 	return (
 // 		<div className={`chat ${chatClassName}`}>
 // 			<div className='chat-image avatar'>
 // 				<div className='w-10 rounded-full'>
-// 					<img alt='Tailwind CSS chat bubble component' src={profilePic} />
+// 					<img alt='profile' src={profilePic} />
 // 				</div>
 // 			</div>
-// 			<div className={`chat-bubble text-white ${bubbleBgColor} ${shakeClass} pb-2`}>{message.message}</div>
-// 			<div className='chat-footer opacity-50 text-xs flex gap-1 items-center'>{formattedTime}</div>
+
+// 			<div className={`chat-bubble ${bubbleStyle} ${shakeClass} pb-2`}>
+// 				{message.message}
+// 			</div>
+
+// 			<div className='chat-footer text-white text-xs flex gap-1 items-center'>
+// 				{formattedTime}
+// 			</div>
 // 		</div>
 // 	);
 // };
+
 // export default Message;
-const Message = () => {
-  return (
-    <div className="chat chat-end">
-      <div className="chat-image avatar">
-        <div className="w-10 rounded-full">
-          <img
-            alt="Tailwind CSS chat bubble component"
-            src="https://img.daisyui.com/images/profile/demo/anakeen@192.webp"
-          />
-        </div>
-      </div>
+import { useAuthContext } from "../../context/AuthContext";
+import { extractTime } from "../../utils/extractTime";
+import useConversation from "../../zustand/useConversation";
 
-      <div className="chat-bubble text-white bg-blue-500">
-        hi! What is up?
-      </div>
+const Message = ({ message }) => {
+	const { authUser } = useAuthContext();
+	const { selectedConversation } = useConversation();
 
-      <div className="chat-footer opacity-50 text-xs flex gap-1 items-center">
-        12:42
-      </div>
-    </div>
-  );
+	const getSenderId = (message) => {
+		if (!message?.senderId) return null;
+		if (typeof message.senderId === "string") return message.senderId;
+		if (typeof message.senderId === "object") return message.senderId._id;
+		return null;
+	};
+
+	const fromMe =
+	message.senderId?.toString() !== selectedConversation?._id?.toString();
+
+	const formattedTime = extractTime(message.createdAt);
+	const chatClassName = fromMe ? "chat-end" : "chat-start";
+	const profilePic = fromMe
+		? authUser.profilePic
+		: selectedConversation?.profilePic;
+
+	const bubbleStyle = fromMe
+		? "bg-blue-500 text-white"
+		: "bg-black text-white";
+
+	const shakeClass = message.shouldShake ? "shake" : "";
+
+	return (
+		<div className={`chat ${chatClassName}`}>
+			<div className='chat-image avatar'>
+				<div className='w-10 rounded-full'>
+					<img alt='profile' src={profilePic} />
+				</div>
+			</div>
+
+			<div className={`chat-bubble ${bubbleStyle} ${shakeClass} pb-2`}>
+				{message.message}
+			</div>
+
+			<div className='chat-footer text-white text-xs flex gap-1 items-center'>
+				{formattedTime}
+			</div>
+		</div>
+	);
 };
 
 export default Message;
