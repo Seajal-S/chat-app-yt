@@ -64,13 +64,13 @@
 // };
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
-import { getReceiverSocketId, io } from "../socket/socket.js";
+import { io, getReceiverSocketId } from "../socket/socket.js";
 
 export const sendMessage = async (req, res) => {
 	try {
 		const { message } = req.body;
 		const { id: receiverId } = req.params;
-		const senderId = req.user._id;
+		const senderId = req.user._id.toString();
 
 		let conversation = await Conversation.findOne({
 			participants: { $all: [senderId, receiverId] },
@@ -92,8 +92,8 @@ export const sendMessage = async (req, res) => {
 
 		await Promise.all([conversation.save(), newMessage.save()]);
 
-		// ✅ SOCKET EMIT (MOST IMPORTANT)
-		const receiverSocketId = getReceiverSocketId(receiverId);
+		// ✅ REAL-TIME SOCKET DELIVERY (FINAL FIX)
+		const receiverSocketId = getReceiverSocketId(receiverId.toString());
 		if (receiverSocketId) {
 			io.to(receiverSocketId).emit("newMessage", newMessage);
 		}
@@ -108,7 +108,7 @@ export const sendMessage = async (req, res) => {
 export const getMessages = async (req, res) => {
 	try {
 		const { id: userToChatId } = req.params;
-		const senderId = req.user._id;
+		const senderId = req.user._id.toString();
 
 		const conversation = await Conversation.findOne({
 			participants: { $all: [senderId, userToChatId] },
