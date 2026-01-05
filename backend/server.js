@@ -181,15 +181,15 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
-
-/* ✅ SERVE FRONTEND (CORRECT PATH) */
-const frontendPath = path.join(__dirname, "..","frontend", "dist");
+/* ✅ SERVE FRONTEND (RENDER SAFE) */
+const frontendPath = path.join(__dirname, "backend", "frontend", "dist");
 app.use(express.static(frontendPath));
 
-/* ✅ EXPRESS 5 SAFE FALLBACK — NO "*" */
+/* ✅ EXPRESS 5 SAFE SPA FALLBACK */
 app.use((req, res) => {
 	res.sendFile(path.join(frontendPath, "index.html"));
 });
+
 
 server.listen(PORT, () => {
 	connectToMongoDB();
